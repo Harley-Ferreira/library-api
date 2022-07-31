@@ -16,7 +16,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles("test")
 @DataJpaTest
-public class BookRepositoryTest {
+class BookRepositoryTest {
 
     @Autowired
     TestEntityManager testEntityManager;
@@ -26,7 +26,7 @@ public class BookRepositoryTest {
 
     @Test
     @DisplayName("Must return true when there is no book in the base with the informed isbn.")
-    public void mustReturnTrueWhenThereIsAlreadyBookWithIsbn() {
+    void mustReturnTrueWhenThereIsAlreadyBookWithIsbn() {
         // Scenary
         Book book = createValidBook();
         testEntityManager.persist(book);
@@ -41,7 +41,7 @@ public class BookRepositoryTest {
 
     @Test
     @DisplayName("Must return false when there is no book in the base with the informed isbn.")
-    public void returnFalseWhenIsbnDoesntExist() {
+    void returnFalseWhenIsbnDoesntExist() {
         // Scenary
 
         // Execution

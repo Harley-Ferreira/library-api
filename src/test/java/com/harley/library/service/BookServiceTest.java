@@ -19,7 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles("test")
-public class BookServiceTest {
+class BookServiceTest {
 
     BookService bookService;
     @MockBean
@@ -32,7 +32,7 @@ public class BookServiceTest {
 
     @Test
     @DisplayName("Must save a book")
-    public void saveBookTest() {
+    void saveBookTest() {
         //Scenary
         Book book = createValidBook();
         Book book2 = createValidBook();
@@ -51,7 +51,7 @@ public class BookServiceTest {
 
     @Test
     @DisplayName("Should throw an error when trying to register a book with an existing isbn.")
-    public void shouldNotSaveABookWithDuplicatedIsbn() {
+    void shouldNotSaveABookWithDuplicatedIsbn() {
         // Scenary
         Book book =  createValidBook();
         Mockito.when(bookRepository.existsByIsbn(Mockito.anyString())).thenReturn(true);

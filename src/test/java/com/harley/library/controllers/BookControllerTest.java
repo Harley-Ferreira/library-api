@@ -32,7 +32,7 @@ import java.util.Optional;
 @ActiveProfiles("test")
 @WebMvcTest
 @AutoConfigureMockMvc
-public class BookControllerTest {
+class BookControllerTest {
 
     static String BOOK_API = "/api/books";
 
@@ -44,7 +44,7 @@ public class BookControllerTest {
 
     @Test
     @DisplayName("Must successfully create a book.")
-    public void createBookTest() throws Exception {
+    void createBookTest() throws Exception {
         // Scenary
         BookDTO bookDTO = getCreateNewBookDTO();
         Book book = Book.builder().id(1l).title("My Adventures").author("Mary").isbn("1234").build();
@@ -70,7 +70,7 @@ public class BookControllerTest {
 
     @Test
     @DisplayName("Should throw a validation error when there isn't data enough to create a book.")
-    public void createInvalidBookTest() throws Exception {
+    void createInvalidBookTest() throws Exception {
         // Scenary
         String json = new ObjectMapper().writeValueAsString(new BookDTO());
 
@@ -90,7 +90,7 @@ public class BookControllerTest {
 
     @Test
     @DisplayName("Should throw an error when trying to register a book with an existing isbn.")
-    public void createBookWithDuplicatedIsnb() throws Exception{
+    void createBookWithDuplicatedIsnb() throws Exception{
         // Scenary
         BookDTO bookDTO = getCreateNewBookDTO();
         String json = new ObjectMapper().writeValueAsString(bookDTO);
@@ -114,7 +114,7 @@ public class BookControllerTest {
 
     @Test
     @DisplayName("Must get the information from a saved book")
-    public void getBookDetails() throws Exception {
+    void getBookDetails() throws Exception {
         // Given
         Long id =  1l;
         Book book = getCreateNewBook();
@@ -137,7 +137,7 @@ public class BookControllerTest {
 
     @Test
     @DisplayName("Should return an exception when not finding a book with the id passed.")
-    public void bookNotFound() throws Exception {
+    void bookNotFound() throws Exception {
 
         // Given
         BDDMockito.given(bookService.getById(Mockito.anyLong()))
@@ -156,7 +156,7 @@ public class BookControllerTest {
 
     @Test
     @DisplayName("Must successfully delete a book")
-    public void deleteBook() throws Exception {
+    void deleteBook() throws Exception {
         // Given
         BDDMockito.given(bookService.getById(Mockito.anyLong())).willReturn(Optional.of(Book.builder().id(1l).build()));
 
@@ -172,7 +172,7 @@ public class BookControllerTest {
 
     @Test
     @DisplayName("Should give an error when trying to delete a book that doesn't exist.")
-    public void errorWhenDeletingBook() throws Exception {
+    void errorWhenDeletingBook() throws Exception {
         // Given
         BDDMockito.given(bookService.getById(Mockito.anyLong())).willReturn(Optional.empty());
 
