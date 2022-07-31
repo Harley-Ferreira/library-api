@@ -30,5 +30,10 @@ public class BookServiceImp implements BookService {
         return Optional.empty();
     }
 
+    @Override
+    public void delete(Long id) {
+        bookRepository.deleteById(id);
+    }
+
 
 }

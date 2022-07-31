@@ -154,6 +154,38 @@ public class BookControllerTest {
 
     }
 
+    @Test
+    @DisplayName("Must successfully delete a book")
+    public void deleteBook() throws Exception {
+        // Given
+        BDDMockito.given(bookService.getById(Mockito.anyLong())).willReturn(Optional.of(Book.builder().id(1l).build()));
+
+        // When
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+                .delete(BOOK_API.concat("/" + 1));
+
+        // Then
+        mockMvc.perform(request)
+                .andExpect(MockMvcResultMatchers.status().isNoContent());
+
+    }
+
+    @Test
+    @DisplayName("Should give an error when trying to delete a book that doesn't exist.")
+    public void errorWhenDeletingBook() throws Exception {
+        // Given
+        BDDMockito.given(bookService.getById(Mockito.anyLong())).willReturn(Optional.empty());
+
+        // When
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+                .delete(BOOK_API.concat("/" + 1));
+
+        // Then
+        mockMvc.perform(request)
+                .andExpect(MockMvcResultMatchers.status().isNotFound());
+
+    }
+
     private BookDTO getCreateNewBookDTO() {
         return BookDTO.builder().title("My Adventures").author("Mary").isbn("1234").build();
     }
