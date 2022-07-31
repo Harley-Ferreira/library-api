@@ -15,6 +15,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.util.Optional;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(SpringExtension.class)
@@ -36,6 +38,7 @@ class BookServiceTest {
         //Scenary
         Book book = createValidBook();
         Book book2 = createValidBook();
+        book2.setId(1l);
         Mockito.when(bookRepository.existsByIsbn(Mockito.anyString())).thenReturn(false);
         Mockito.when(bookService.save(book)).thenReturn(book2);
 
@@ -65,6 +68,41 @@ class BookServiceTest {
                 .hasMessage("Isbn already registered");
         Mockito.verify(bookRepository, Mockito.never()).save(book);
 
+    }
+
+    @Test
+    @DisplayName("should get a book by id successfully.")
+    void getBookById() {
+        // Scenary
+        Long id = 1l;
+        Book book = createValidBook();
+        book.setId(1l);
+        Mockito.when(bookRepository.findById(id)).thenReturn(Optional.of(book));
+
+        // Execution
+        Optional<Book> foundBook = bookService.getById(id);
+
+        // Verification
+        Assertions.assertThat(foundBook.isPresent()).isTrue();
+        Assertions.assertThat(foundBook.get().getId()).isEqualTo(id);
+        Assertions.assertThat(foundBook.get().getIsbn()).isEqualTo(book.getIsbn());
+        Assertions.assertThat(foundBook.get().getAuthor()).isEqualTo(book.getAuthor());
+        Assertions.assertThat(foundBook.get().getTitle()).isEqualTo(book.getTitle());
+
+    }
+
+    @Test
+    @DisplayName("Should return empty when trying to get a book.")
+    void getEmptyBook() {
+        // Scenary
+        Long id = 1l;
+        Mockito.when(bookRepository.findById(id)).thenReturn(Optional.empty());
+
+        // Execution
+        Optional<Book> foundBook = bookService.getById(id);
+
+        // Verification
+        Assertions.assertThat(foundBook.isPresent()).isFalse();
     }
 
     private Book createValidBook() {
