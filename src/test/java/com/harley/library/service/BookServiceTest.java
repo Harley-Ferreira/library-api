@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -103,6 +104,71 @@ class BookServiceTest {
 
         // Verification
         Assertions.assertThat(foundBook.isPresent()).isFalse();
+    }
+
+    @Test
+    @DisplayName("Should successfully delete a book by the id passed.")
+    void deleteABook() {
+        // Scenary
+        Book book = createValidBook();
+        book.setId(1l);
+
+        // Execution
+        org.junit.jupiter.api.Assertions.assertDoesNotThrow(() -> bookService.delete(book));
+
+        // Verification
+        Mockito.verify(bookRepository, Mockito.times(1)).delete(book);
+    }
+
+    @Test
+    @DisplayName("Should give an error when trying to delete a book.")
+    void errorDeleteABook() {
+        // Scenary
+        Book book = new Book();
+
+        // Execution
+        Throwable throwable = org.junit.jupiter.api.Assertions.assertThrows(IllegalArgumentException.class, () -> bookService.delete(book));
+
+        // Verification
+        Mockito.verify(bookRepository, Mockito.never()).delete(book);
+        assertThat(throwable)
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Book id can't be null");
+    }
+
+    @Test
+    @DisplayName("Should successfully update a book by the id passed.")
+    void updateABook() {
+        // Scenary
+        Book book = createValidBook();
+        book.setId(1l);
+        Mockito.when(bookRepository.save(book)).thenReturn(book);
+
+        // Execution
+        Book bookUpdated = org.junit.jupiter.api.Assertions.assertDoesNotThrow(() -> bookService.update(book));
+
+        // Verification
+        Mockito.verify(bookRepository, Mockito.times(1)).save(book);
+        Assertions.assertThat(book.getId()).isEqualTo(bookUpdated.getId());
+        Assertions.assertThat(book.getTitle()).isEqualTo(bookUpdated.getTitle());
+        Assertions.assertThat(book.getIsbn()).isEqualTo(bookUpdated.getIsbn());
+        Assertions.assertThat(book.getAuthor()).isEqualTo(bookUpdated.getAuthor());
+    }
+
+    @Test
+    @DisplayName("Should give an error when trying to update a book.")
+    void errorUpdateABook() {
+        // Scenary
+        Book book = new Book();
+
+        // Execution
+        Throwable throwable = org.junit.jupiter.api.Assertions.assertThrows(IllegalArgumentException.class, () -> bookService.update(book));
+
+        // Verification
+        Mockito.verify(bookRepository, Mockito.never()).save(book);
+        assertThat(throwable)
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Book id can't be null");
     }
 
     private Book createValidBook() {
