@@ -26,6 +26,8 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+import java.util.Optional;
+
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles("test")
 @WebMvcTest
@@ -110,8 +112,53 @@ public class BookControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("errors[0]").value(errorMessage));
     }
 
+    @Test
+    @DisplayName("Must get the information from a saved book")
+    public void getBookDetails() throws Exception {
+        // Given
+        Long id =  1l;
+        Book book = getCreateNewBook();
+        BDDMockito.given(bookService.getById(id)).willReturn(Optional.of(book));
+
+        // When
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+                .get(BOOK_API.concat("/" + id))
+                .accept(MediaType.APPLICATION_JSON);
+
+        // Then
+        BookDTO bookDTO = getCreateNewBookDTO();
+        mockMvc.perform(request)
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("id").isNotEmpty())
+                .andExpect(MockMvcResultMatchers.jsonPath("title").value(bookDTO.getTitle()))
+                .andExpect(MockMvcResultMatchers.jsonPath("author").value(bookDTO.getAuthor()))
+                .andExpect(MockMvcResultMatchers.jsonPath("isbn").value(bookDTO.getIsbn()));
+    }
+
+    @Test
+    @DisplayName("Should return an exception when not finding a book with the id passed.")
+    public void bookNotFound() throws Exception {
+
+        // Given
+        BDDMockito.given(bookService.getById(Mockito.anyLong()))
+                .willReturn(Optional.empty());
+
+        // When
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+                .get(BOOK_API.concat("/" + 3))
+                .accept(MediaType.APPLICATION_JSON);
+
+        // Then
+        mockMvc.perform(request)
+                .andExpect(MockMvcResultMatchers.status().isNotFound());
+
+    }
 
     private BookDTO getCreateNewBookDTO() {
         return BookDTO.builder().title("My Adventures").author("Mary").isbn("1234").build();
+    }
+
+    private Book getCreateNewBook() {
+        return Book.builder().id(1l).title("My Adventures").author("Mary").isbn("1234").build();
     }
 }

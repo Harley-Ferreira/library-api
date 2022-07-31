@@ -6,6 +6,8 @@ import com.harley.library.respositories.BookRepository;
 import com.harley.library.services.BookService;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class BookServiceImp implements BookService {
 
@@ -22,4 +24,11 @@ public class BookServiceImp implements BookService {
         }
         return bookRepository.save(book);
     }
+
+    @Override
+    public Optional<Book> getById(Long id) {
+        return Optional.empty();
+    }
+
+
 }
