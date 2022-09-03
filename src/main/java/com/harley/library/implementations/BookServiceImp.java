@@ -4,6 +4,10 @@ import com.harley.library.entities.Book;
 import com.harley.library.exceptions.BusinessException;
 import com.harley.library.respositories.BookRepository;
 import com.harley.library.services.BookService;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -46,5 +50,13 @@ public class BookServiceImp implements BookService {
         return bookRepository.save(book);
     }
 
-
+    @Override
+    public Page find(Book book, Pageable pageable) {
+        Example<Book> example = Example.of(book, ExampleMatcher
+                .matching()
+                .withIgnoreCase()
+                .withIgnoreNullValues()
+                .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING));
+        return bookRepository.findAll(example, pageable);
+    }
 }
