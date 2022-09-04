@@ -59,4 +59,9 @@ public class BookServiceImp implements BookService {
                 .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING));
         return bookRepository.findAll(example, pageable);
     }
+
+    @Override
+    public Optional<Book> getBookByIsbn(String isbn) {
+        return Optional.empty();
+    }
 }
