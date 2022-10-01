@@ -1,6 +1,7 @@
 package com.harley.library.controllers;
 
 import com.harley.library.dtos.LoanDTO;
+import com.harley.library.dtos.ReturnedLoanDTO;
 import com.harley.library.entities.Book;
 import com.harley.library.entities.Loan;
 import com.harley.library.services.BookService;
@@ -34,6 +35,13 @@ public class LoanController {
         loan = loanService.save(loan);
 
         return loan.getId();
+    }
+
+    @PatchMapping("{id}")
+    public void returnedBook(@PathVariable Long id, @RequestBody ReturnedLoanDTO returnedLoanDTO) {
+        Loan loan = loanService.getById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        loan.setReturned(returnedLoanDTO.getReturned());
+        loanService.update(loan);
     }
 
 

@@ -1,7 +1,9 @@
 package com.harley.library.controllers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.harley.library.dtos.LoanDTO;
+import com.harley.library.dtos.ReturnedLoanDTO;
 import com.harley.library.entities.Book;
 import com.harley.library.entities.Loan;
 import com.harley.library.exceptions.BusinessException;
@@ -27,6 +29,9 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.time.LocalDate;
 import java.util.Optional;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles("test")
@@ -64,7 +69,7 @@ public class LoanControllerTest {
 
         // Then
         mockMvc.perform(requestBuilder)
-                .andExpect(MockMvcResultMatchers.status().isCreated())
+                .andExpect(status().isCreated())
                 .andExpect(MockMvcResultMatchers.content().string("1"));
     }
 
@@ -85,7 +90,7 @@ public class LoanControllerTest {
 
         // Then
         mockMvc.perform(requestBuilder)
-                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(status().isBadRequest())
                 .andExpect(MockMvcResultMatchers.jsonPath("errors", Matchers.hasSize(1)))
                 .andExpect(MockMvcResultMatchers.jsonPath("errors[0]").value("Book not found for passed isbn"));
     }
@@ -109,8 +114,44 @@ public class LoanControllerTest {
 
         // Then
         mockMvc.perform(requestBuilder)
-                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(status().isBadRequest())
                 .andExpect(MockMvcResultMatchers.jsonPath("errors", Matchers.hasSize(1)))
                 .andExpect(MockMvcResultMatchers.jsonPath("errors[0]").value("Book already borrowed"));
+    }
+
+    @Test
+    @DisplayName("should update loan")
+    void givenReturnedLoanDTO_whenCallReturnedBook_thenReturnUpdateLoan() throws Exception {
+        // Given
+        ReturnedLoanDTO returnedLoanDTO = ReturnedLoanDTO.builder().returned(true).build();
+        String json = new ObjectMapper().writeValueAsString(returnedLoanDTO);
+        Loan loan = Loan.builder().id(1l).build();
+        BDDMockito.given(loanService.getById(Mockito.anyLong())).willReturn(Optional.of(loan));
+
+        // When and Then
+        mockMvc.perform(patch(LOAN_API.concat("/1"))
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andExpect(status().isOk());
+
+        Mockito.verify(loanService, Mockito.times(1)).update(Mockito.any());
+    }
+
+    @Test
+    @DisplayName("should throw an exception when try update a book")
+    void givenReturnedLoanDTO_whenCallReturnedBook_thenThrowException() throws Exception {
+        // Given
+        ReturnedLoanDTO returnedLoanDTO = ReturnedLoanDTO.builder().returned(true).build();
+        String json = new ObjectMapper().writeValueAsString(returnedLoanDTO);
+
+        BDDMockito.given(loanService.getById(Mockito.anyLong())).willReturn(Optional.empty());
+
+        // When and Then
+        mockMvc.perform(patch(LOAN_API.concat("/1"))
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andExpect(status().isNotFound());
     }
 }

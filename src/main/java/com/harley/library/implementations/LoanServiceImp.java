@@ -7,6 +7,8 @@ import com.harley.library.services.LoanService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class LoanServiceImp implements LoanService {
@@ -18,6 +20,16 @@ public class LoanServiceImp implements LoanService {
         if (loanRepository.existsByBookAndNotReturned(loan.getBook()))
             throw new BusinessException("Book already borrowed");
 
+        return loanRepository.save(loan);
+    }
+
+    @Override
+    public Optional<Loan> getById(Long id) {
+        return loanRepository.findById(id);
+    }
+
+    @Override
+    public Loan update(Loan loan) {
         return loanRepository.save(loan);
     }
 }
