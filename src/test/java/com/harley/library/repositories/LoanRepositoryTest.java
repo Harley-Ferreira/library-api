@@ -1,5 +1,6 @@
 package com.harley.library.repositories;
 
+import com.harley.library.entities.Book;
 import com.harley.library.entities.Loan;
 import com.harley.library.respositories.LoanRepository;
 import org.assertj.core.api.Assertions;
@@ -9,6 +10,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -37,4 +41,21 @@ public class LoanRepositoryTest {
         Assertions.assertThat(exists).isTrue();
     }
 
+    @Test
+    @DisplayName("Should return a list of loan.")
+    void givenALoanDTO_whenCallFindByBookIsbnOrCustomer_ThenReturnListLoan() {
+        Loan loan = createLoan();
+        loan.setId(null);
+        loan.getBook().setId(null);
+        entityManager.persist(loan.getBook());
+        entityManager.persist(loan);
+
+        Page<Loan> result = loanRepository.findByBookIsbnOrCustomer("123", "Harley", PageRequest.of(0, 10));
+
+        Assertions.assertThat(result.getContent()).hasSize(1);
+        Assertions.assertThat(result.getContent()).contains(loan);
+        Assertions.assertThat(result.getPageable().getPageSize()).isEqualTo(10);
+        Assertions.assertThat(result.getPageable().getPageNumber()).isEqualTo(0);
+        Assertions.assertThat(result.getTotalElements()).isEqualTo(1);
+    }
 }

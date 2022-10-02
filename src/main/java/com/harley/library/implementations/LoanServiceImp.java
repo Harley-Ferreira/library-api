@@ -1,10 +1,13 @@
 package com.harley.library.implementations;
 
+import com.harley.library.dtos.LoanDTO;
 import com.harley.library.entities.Loan;
 import com.harley.library.exceptions.BusinessException;
 import com.harley.library.respositories.LoanRepository;
 import com.harley.library.services.LoanService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -31,5 +34,10 @@ public class LoanServiceImp implements LoanService {
     @Override
     public Loan update(Loan loan) {
         return loanRepository.save(loan);
+    }
+
+    @Override
+    public Page<Loan> find(LoanDTO loanDTO, Pageable pageable) {
+        return loanRepository.findByBookIsbnOrCustomer(loanDTO.getIsbn(), loanDTO.getCustomer(), pageable);
     }
 }

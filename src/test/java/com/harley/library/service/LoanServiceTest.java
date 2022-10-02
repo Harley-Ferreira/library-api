@@ -1,5 +1,6 @@
 package com.harley.library.service;
 
+import com.harley.library.dtos.LoanDTO;
 import com.harley.library.entities.Book;
 import com.harley.library.entities.Loan;
 import com.harley.library.exceptions.BusinessException;
@@ -12,10 +13,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.*;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -100,6 +104,30 @@ public class LoanServiceTest {
 
         assertThat(returnedLoan.getReturned()).isTrue();
         verify(loanRepository).save(loan);
+    }
+
+    @Test
+    @DisplayName("Should find an object Loan by isbn or customer")
+    void givenALoan_WhenCallFind_ThenReturnAListLoan() {
+        // Scenary
+        LoanDTO loanDTO = LoanDTO.builder().customer("Harley").isbn("123").build();
+        Loan loan = createLoan();
+        PageRequest pageRequest = PageRequest.of(0,10);
+        List<Loan> loanList = Arrays.asList(loan);
+
+        Page<Loan> page = new PageImpl<>(loanList, pageRequest, loanList.size());
+        when(loanRepository.findByBookIsbnOrCustomer(Mockito.anyString(), Mockito.anyString(), Mockito.any(Pageable.class)))
+                .thenReturn(page);
+
+        // Execution
+        Page<Loan> result = loanService.find(loanDTO,pageRequest);
+
+        // Verification
+        assertThat(result.getTotalElements()).isEqualTo(1);
+        assertThat(result.getContent()).isEqualTo(loanList);
+        assertThat(result.getPageable().getPageNumber()).isEqualTo(0);
+        assertThat(result.getPageable().getPageSize()).isEqualTo(10);
+
     }
 
     public static Loan createLoan() {
