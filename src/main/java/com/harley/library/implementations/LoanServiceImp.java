@@ -1,6 +1,7 @@
 package com.harley.library.implementations;
 
 import com.harley.library.dtos.LoanDTO;
+import com.harley.library.entities.Book;
 import com.harley.library.entities.Loan;
 import com.harley.library.exceptions.BusinessException;
 import com.harley.library.respositories.LoanRepository;
@@ -39,5 +40,10 @@ public class LoanServiceImp implements LoanService {
     @Override
     public Page<Loan> find(LoanDTO loanDTO, Pageable pageable) {
         return loanRepository.findByBookIsbnOrCustomer(loanDTO.getIsbn(), loanDTO.getCustomer(), pageable);
+    }
+
+    @Override
+    public Page<Loan> getLoansByBook(Book book, Pageable pageable) {
+        return loanRepository.findByBook(book, pageable);
     }
 }

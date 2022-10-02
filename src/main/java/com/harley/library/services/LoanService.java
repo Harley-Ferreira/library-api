@@ -1,6 +1,7 @@
 package com.harley.library.services;
 
 import com.harley.library.dtos.LoanDTO;
+import com.harley.library.entities.Book;
 import com.harley.library.entities.Loan;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,4 +16,6 @@ public interface LoanService {
     Loan update(Loan loan);
 
     Page<Loan> find(LoanDTO loanDTO, Pageable pageable);
+
+    Page<Loan> getLoansByBook(Book book, Pageable pageable);
 }
