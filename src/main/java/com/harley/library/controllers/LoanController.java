@@ -7,6 +7,8 @@ import com.harley.library.entities.Book;
 import com.harley.library.entities.Loan;
 import com.harley.library.services.BookService;
 import com.harley.library.services.LoanService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
@@ -23,6 +25,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/loans")
+@Api("API LOAN")
 @RequiredArgsConstructor
 public class LoanController {
 
@@ -32,6 +35,7 @@ public class LoanController {
 
 
     @PostMapping
+    @ApiOperation("CREATE A LOAN")
     @ResponseStatus(HttpStatus.CREATED)
     public Long create(@RequestBody LoanDTO loanDTO) {
         Book book = bookService.getBookByIsbn(loanDTO.getIsbn())
@@ -48,6 +52,7 @@ public class LoanController {
     }
 
     @PatchMapping("{id}")
+    @ApiOperation("FIND A LOAN BY ID")
     public void returnedBook(@PathVariable Long id, @RequestBody ReturnedLoanDTO returnedLoanDTO) {
         Loan loan = loanService.getById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         loan.setReturned(returnedLoanDTO.getReturned());
@@ -55,6 +60,7 @@ public class LoanController {
     }
 
     @GetMapping
+    @ApiOperation("FIND A LOAN BY ANY PARAMS")
     public Page<LoanDTO> find(LoanDTO loanDTO, Pageable pageable) {
         Page<Loan> result = loanService.find(loanDTO, pageable);
         List<LoanDTO> list = result.getContent()
