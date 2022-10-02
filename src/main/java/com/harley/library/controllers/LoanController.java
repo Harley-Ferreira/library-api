@@ -56,7 +56,6 @@ public class LoanController {
 
     @GetMapping
     public Page<LoanDTO> find(LoanDTO loanDTO, Pageable pageable) {
-        Loan filter = modelMapper.map(loanDTO, Loan.class);
         Page<Loan> result = loanService.find(loanDTO, pageable);
         List<LoanDTO> list = result.getContent()
                 .stream()

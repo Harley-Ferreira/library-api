@@ -57,7 +57,7 @@ public class LoanControllerTest {
     @DisplayName("Must create a loan when call the create method passing a loanDTO")
     void givenValidLoanDTO_WhenCallCreate_ThenReturnCreatedLoan() throws Exception {
         // Given
-        LoanDTO loanDTO = LoanDTO.builder().isbn("123").customer("Harley").build();
+        LoanDTO loanDTO = LoanDTO.builder().isbn("123").customerEmail("harley@email.com").customer("Harley").build();
         String json = new ObjectMapper().writeValueAsString(loanDTO);
 
         Book book = Book.builder().id(1l).isbn("123").build();
